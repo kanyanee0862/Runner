@@ -1,48 +1,52 @@
 #pragma once
 #include <DxLib.h>
-#include "Reactangle2D.hpp"
-#include "input.hpp"
+#include "Reactangle2D.hpp"//四角形処理　
+#include "input.hpp"//キー
+#include "Base.hpp"//地面
+#include "Reactangle_Collision.hpp"//当たり判定
+
 //プレイヤの位置
 class Player
 {
 private:
 	Reactangle2D Rect;
 	float jumpForce;
+	float fallSpeed;
 	float Gravity;
-	int Base;
 	
 public:
+	Detect_Collide col;
+	Base  base;
 	void Init()
 	{
-		jumpForce = -5.0f;
-		Gravity = 0.5f;
-		Rect.Reactangle_Init(Position{ 100,300 }, Scale{ 32,32 });
-		Base = 132;
+		jumpForce = -8.0f;
+		fallSpeed = 0.5f;
+		Rect.Reactangle_Init(Position{ 50,300 }, Scale{ 32,32 });
+		Gravity = 9.8f / 60 / 60;
+		
 	}
 	void Update()
 	{
 		Input().Get().updateKey();
-		Rect.pos.y += Gravity;
-		if (Input().Get().getKeyFrame(KEY_INPUT_SPACE) >= 1)
+		
+		if (Input().Get().getKeyFrame(KEY_INPUT_SPACE) >= 1 && col.Check_Square_Collide(Rect.pos.x, Rect.pos.y, Rect.scale.w, Rect.scale.h, base.x, base.y, base.w, base.h))//仮長すぎる
 		{
-			if (Rect.pos.y = Base)
-			{
-				Rect.pos.y = jumpForce;
-			}
-			
+			fallSpeed = jumpForce;
 		}
-		if (Rect.pos.y >= Base)
+		Rect.pos.y += static_cast<int>(fallSpeed);
+
+		if (col.Check_Square_Collide(Rect.pos.x, Rect.pos.y, Rect.scale.w, Rect.scale.h, base.x, base.y, base.w, base.h))//仮長すぎる
 		{
-			Gravity = 0.0f;
-			Rect.pos.y = Base;
+			fallSpeed = 0.0f;
 		}
 		else
 		{
-			Gravity = 0.5f;
+			fallSpeed += Gravity*80;
 		}
 	}
 	void Draw()
 	{
+		
 		Rect.Render(GetColor(255, 0, 0), true);
 	}
 	

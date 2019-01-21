@@ -131,9 +131,12 @@
     <ClCompile Include="Runner.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Base.hpp" />
+    <ClInclude Include="Enemy.h" />
     <ClInclude Include="input.hpp" />
     <ClInclude Include="Player.hpp" />
     <ClInclude Include="Reactangle2D.hpp" />
+    <ClInclude Include="Reactangle_Collision.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
