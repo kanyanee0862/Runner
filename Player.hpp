@@ -1,53 +1,69 @@
 #pragma once
 #include <DxLib.h>
-#include "Reactangle2D.hpp"//四角形処理　
+#include "Rectangle2D.hpp"//四角形処理　
 #include "input.hpp"//キー
 #include "Base.hpp"//地面
-#include "Reactangle_Collision.hpp"//当たり判定
+#include "Rectangle_Collision.hpp"//当たり判定
+#include "Enemy.hpp"
 
 //プレイヤの位置
 class Player
 {
 private:
-	Reactangle2D Rect;
+	
 	float jumpForce;
 	float fallSpeed;
 	float Gravity;
 	
 public:
-	Detect_Collide col;
+	Rectangle2D playerRect;
 	Base  base;
+	Enemy enemy;
+	//---------------
+	//プレイヤ座標
+	int x = 50;
+	int y = 300;
+	int w = 32;
+	int h = 32;
+	int colorBlue = 255;
+	//-----------------
 	void Init()
 	{
-		jumpForce = -8.0f;
-		fallSpeed = 0.5f;
-		Rect.Reactangle_Init(Position{ 50,300 }, Scale{ 32,32 });
-		Gravity = 9.8f / 60 / 60;
-		
+		jumpForce = -8.0f; //ジャンプ力
+		fallSpeed = 1.0f; //空中にいたら、落ちていく値
+		playerRect.Rectangle_Init(Position{ x,y }, Scale{ w,h }); //プレイヤの座標を入力
+		Gravity = 9.8f / 60 / 60; //重力
+		base.Init();	//地面の初期化
 	}
 	void Update()
 	{
 		Input().Get().updateKey();
-		
-		if (Input().Get().getKeyFrame(KEY_INPUT_SPACE) >= 1 && col.Check_Square_Collide(Rect.pos.x, Rect.pos.y, Rect.scale.w, Rect.scale.h, base.x, base.y, base.w, base.h))//仮長すぎる
+		//スペースキーを押したら、ジャンプする
+		if (Input().Get().getKeyFrame(KEY_INPUT_SPACE) >= 1 && Box_Collision(Rectangle2D{ playerRect }, Rectangle2D{ base.baseRect }))
 		{
 			fallSpeed = jumpForce;
 		}
-		Rect.pos.y += static_cast<int>(fallSpeed);
-
-		if (col.Check_Square_Collide(Rect.pos.x, Rect.pos.y, Rect.scale.w, Rect.scale.h, base.x, base.y, base.w, base.h))//仮長すぎる
+		//プレイヤの
+		playerRect.pos.y += static_cast<int>(fallSpeed);
+		
+		//地面と当たり判定がtrueなら、落下速度 0
+		if (Box_Collision(Rectangle2D{ playerRect }, Rectangle2D{ base.baseRect }))
 		{
 			fallSpeed = 0.0f;
 		}
 		else
-		{
+		{//空中にいる間、重力で落ちていく
 			fallSpeed += Gravity*80;
 		}
+
+		
 	}
+	//--------------------------------------------------------------------------
+	//描画する処理
 	void Draw()
 	{
 		
-		Rect.Render(GetColor(255, 0, 0), true);
+		playerRect.Render(GetColor(255, 0, colorBlue), true);
 	}
 	
 };
