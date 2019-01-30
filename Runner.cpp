@@ -12,14 +12,13 @@
 #include "Rectangle_Collision.hpp"
 //-------------------------------------------------------------------
 const int MAX_ENEMIES = 30;
-
+int frameCnt = 0;
 Player player; 
 Base   base;
 Enemy  enemy[MAX_ENEMIES];
 //--------------------------------------------------------------------------
 typedef std::mt19937 MyRND;  // the Mersenne Twister with a popular choice of parameters
 uint32_t seed_val;           // populate somehow
-
 MyRND rnd;                   // e.g. keep one global instance (per thread)
 //-------------------------------------------------------------------
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
@@ -33,7 +32,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//
 	player.Init();//プレイヤの初期化
 	//
-	for (int i = 0; i < MAX_ENEMIES; ++i)
+	for (int i = 0; i < MAX_ENEMIES&&frameCnt <=30; ++i)
 	{
 		int x = static_cast<int>(640 + uint_dist10(rnd) * 10 * i);
 		enemy[i].Init(x);
@@ -44,6 +43,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		
 		//プレイヤの更新
 		player.Update(); 
+		frameCnt++;
+		if (frameCnt >= 30)
+		{
+			frameCnt = 0;
+		}
 		//敵の更新
 		for (int i = 0; i < MAX_ENEMIES; ++i)
 		{

@@ -38,18 +38,20 @@ public:
 	void Update()
 	{
 		Input().Get().updateKey();
+		float checkY = 0.0f;
 		//スペースキーを押したら、ジャンプする
-		if (Input().Get().getKeyFrame(KEY_INPUT_SPACE) >= 1 && Box_Collision(Rectangle2D{ playerRect }, Rectangle2D{ base.baseRect }))
+		if (Input().Get().getKeyFrame(KEY_INPUT_SPACE) >= 1 && 
+			Box_Collision(Rectangle2D{ playerRect }, Rectangle2D{ base.baseRect }))
 		{
 			fallSpeed = jumpForce;
 		}
 		//プレイヤの
 		playerRect.pos.y += static_cast<int>(fallSpeed);
-		
+		Prevent_Stuck(playerRect.pos.y,checkY);
 		//地面と当たり判定がtrueなら、落下速度 0
 		if (Box_Collision(Rectangle2D{ playerRect }, Rectangle2D{ base.baseRect }))
 		{
-			fallSpeed = 0.0f;
+ 			fallSpeed = 0.0f;
 		}
 		else
 		{//空中にいる間、重力で落ちていく
@@ -65,5 +67,20 @@ public:
 		
 		playerRect.Render(GetColor(255, 0, colorBlue), true);
 	}
-	
+	//--------------------------------------------------------------------------
+	//めり込まない処理
+	void Prevent_Stuck(float y,float cy)
+	{
+		//縦軸に対する移動
+		while (cy != 0.0f) {
+			float  preY = cy;
+			if (cy >= 1.0f) { y += 1.0f;	cy -= 1.0f; }
+			else if (cy <= -1.0f) { y -= 1.0f;	cy += 1.0f; }
+			else { y += cy;	cy = 0.0f; }
+			if (Box_Collision(Rectangle2D{ playerRect }, Rectangle2D{ base.baseRect })) {
+				y = preY;		//移動をキャンセル
+				break;
+			}
+		}
+	}
 };
